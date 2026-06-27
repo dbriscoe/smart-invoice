@@ -293,8 +293,10 @@ const App = () => {
                         )}
                     </div>
                     <div className="invoice-details">
-                        <h2>Official Invoice</h2>
-                        <div className="tax-status">NON-VAT</div>
+                        <div className="invoice-title-block">
+                            <h2>Official Invoice</h2>
+                            <div className="tax-status">NON-VAT</div>
+                        </div>
                         <div className="detail-item">
                             <label>Invoice #</label>
                             <input type="text" value={invoice.invoiceNumber} onChange={e => handleInvoiceChange('invoiceNumber', e.target.value)} />
