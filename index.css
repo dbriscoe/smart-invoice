@@ -115,6 +115,9 @@ h1 {
 
 .invoice-details {
     text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .invoice-title-block {
@@ -148,6 +151,8 @@ h1 {
     justify-content: flex-end;
     gap: 0.5rem;
     margin-bottom: 0.25rem;
+    width: max-content;
+    max-width: 100%;
 }
 
 .detail-item label {
@@ -346,7 +351,17 @@ textarea {
 }
 
 .detail-item input {
-    max-width: 180px;
+    min-width: 180px;
+    max-width: min(320px, 100%);
+    text-align: right;
+}
+
+.detail-item .invoice-number-input {
+    transition: width 0.15s ease;
+}
+
+.detail-item .invoice-date-input {
+    width: 180px;
 }
 
 .button {
@@ -518,8 +533,11 @@ textarea {
         flex-direction: column;
         align-items: stretch;
     }
-    .invoice-details { text-align: left; }
-        .detail-item { justify-content: flex-start; }
+    .invoice-details {
+        text-align: right;
+        align-items: flex-end;
+    }
+    .detail-item { justify-content: flex-end; }
     .address-box { width: 100%; }
     .items-table { display: block; overflow-x: auto; white-space: nowrap; }
     .totals-and-notes {

@@ -299,11 +299,11 @@ const App = () => {
                         </div>
                         <div className="detail-item">
                             <label>Invoice #</label>
-                            <input type="text" value={invoice.invoiceNumber} onChange={e => handleInvoiceChange('invoiceNumber', e.target.value)} />
+                            <input className="invoice-number-input" type="text" value={invoice.invoiceNumber} onChange={e => handleInvoiceChange('invoiceNumber', e.target.value)} style={{ width: `${Math.max(180, invoice.invoiceNumber.length * 9 + 28)}px` }} />
                         </div>
                         <div className="detail-item">
                             <label>Date</label>
-                            <input type="date" value={invoice.date} onChange={e => handleInvoiceChange('date', e.target.value)} />
+                            <input className="invoice-date-input" type="date" value={invoice.date} onChange={e => handleInvoiceChange('date', e.target.value)} />
                         </div>
                     </div>
                 </div>
