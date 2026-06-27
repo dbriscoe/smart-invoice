@@ -125,6 +125,17 @@ h1 {
     text-transform: uppercase;
 }
 
+
+.invoice-details .tax-status {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    margin-top: -0.35rem;
+    margin-bottom: 0.65rem;
+    text-transform: uppercase;
+}
+
 .detail-item {
     display: flex;
     align-items: center;
@@ -497,7 +508,7 @@ textarea {
         align-items: stretch;
     }
     .invoice-details { text-align: left; }
-    .detail-item { justify-content: flex-start; }
+        .detail-item { justify-content: flex-start; }
     .address-box { width: 100%; }
     .items-table { display: block; overflow-x: auto; white-space: nowrap; }
     .totals-and-notes {

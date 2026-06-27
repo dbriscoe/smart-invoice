@@ -34,7 +34,7 @@ const defaultInvoice: Invoice = {
     signature: '',
     invoiceNumber: 'INV-T&SBLEE000',
     date: new Date().toISOString().split('T')[0],
-    from: 'Truffle & Scent By Lee\nPembo Taguig\nManila, Philippines\n+63956 533 1521',
+    from: 'Truffle & Scent By Lee\nDTI BN No. 8301368\nPembo Taguig\nManila, Philippines\n+63956 533 1521',
     to: '',
     items: [{ name: 'Mazza Deluxe Black Truffle', qty: 1, price: 649, image: '' }],
     notes: 'Thank you for your business. Please pay within the day.',
@@ -43,10 +43,31 @@ const defaultInvoice: Invoice = {
     discount: 0
 };
 
+
+const ensureInvoiceDefaults = (input: Invoice): Invoice => {
+    let updatedFrom = input.from || defaultInvoice.from;
+
+    if (
+        updatedFrom.includes('Truffle & Scent By Lee') &&
+        !updatedFrom.includes('DTI BN No. 8301368')
+    ) {
+        updatedFrom = updatedFrom.replace(
+            'Truffle & Scent By Lee',
+            'Truffle & Scent By Lee\nDTI BN No. 8301368'
+        );
+    }
+
+    return {
+        ...defaultInvoice,
+        ...input,
+        from: updatedFrom,
+    };
+};
+
 const App = () => {
     const [invoice, setInvoice] = useState<Invoice>(() => {
         const savedInvoice = localStorage.getItem('currentInvoice');
-        return savedInvoice ? JSON.parse(savedInvoice) : defaultInvoice;
+        return savedInvoice ? ensureInvoiceDefaults(JSON.parse(savedInvoice)) : defaultInvoice;
     });
     const [savedInvoices, setSavedInvoices] = useState<Invoice[]>([]);
 
@@ -133,7 +154,7 @@ const App = () => {
     };
 
     const handleLoadInvoice = (invToLoad: Invoice) => {
-        setInvoice(invToLoad);
+        setInvoice(ensureInvoiceDefaults(invToLoad));
     };
 
     const handleDeleteInvoice = (invNumber: string) => {
@@ -272,7 +293,8 @@ const App = () => {
                         )}
                     </div>
                     <div className="invoice-details">
-                        <h2>Invoice</h2>
+                        <h2>Official Invoice</h2>
+                        <div className="tax-status">NON-VAT</div>
                         <div className="detail-item">
                             <label>Invoice #</label>
                             <input type="text" value={invoice.invoiceNumber} onChange={e => handleInvoiceChange('invoiceNumber', e.target.value)} />
