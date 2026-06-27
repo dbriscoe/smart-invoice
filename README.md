@@ -18,3 +18,9 @@ View your app in AI Studio: https://ai.studio/apps/drive/1ZvJ0Pe34l111QWejlw7F0W
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
 3. Run the app:
    `npm run dev`
+
+
+## Layout Notes
+
+- Official Invoice title block contains centred NON-VAT text.
+- Invoice number and date inputs are right-aligned so values grow leftwards when longer.
