@@ -76,17 +76,20 @@ h1 {
 }
 
 .logo-container img {
-    max-width: 270px;
-    max-height: 135px;
+    width: 150px;
+    height: 150px;
+    max-width: 150px;
+    max-height: 150px;
     object-fit: contain;
+    border-radius: 50%;
 }
 
 .logo-uploader {
     position: relative;
-    width: 270px;
-    height: 135px;
+    width: 150px;
+    height: 150px;
     border: 2px dashed var(--border-color);
-    border-radius: 0.375rem;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -497,7 +500,7 @@ textarea {
     width: 200px;
     height: 80px;
     border: 2px dashed var(--border-color);
-    border-radius: 0.375rem;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;

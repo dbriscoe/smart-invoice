@@ -29,12 +29,14 @@ interface Invoice {
     discount: number;
 }
 
+const DEFAULT_LOGO_URL = `${import.meta.env.BASE_URL}truffle-scent-logo.png`;
+
 const defaultInvoice: Invoice = {
-    logo: '',
+    logo: DEFAULT_LOGO_URL,
     signature: '',
     invoiceNumber: 'INV-T&SBLEE000',
     date: new Date().toISOString().split('T')[0],
-    from: 'Truffle & Scent By Lee\nDTI BN No. 8301368\nPembo Taguig\nManila, Philippines\n+63956 533 1521',
+    from: 'Truffle & Scent By Lee\nDTI BN No. 8301368\nTIN: 807-789-743-000\nPembo Taguig\nManila, Philippines\n+63956 533 1521',
     to: '',
     items: [{ name: 'Mazza Deluxe Black Truffle', qty: 1, price: 649, image: '' }],
     notes: 'Thank you for your business. Please pay within the day.',
@@ -57,9 +59,20 @@ const ensureInvoiceDefaults = (input: Invoice): Invoice => {
         );
     }
 
+    if (
+        updatedFrom.includes('DTI BN No. 8301368') &&
+        !updatedFrom.includes('TIN: 807-789-743-000')
+    ) {
+        updatedFrom = updatedFrom.replace(
+            'DTI BN No. 8301368',
+            'DTI BN No. 8301368\nTIN: 807-789-743-000'
+        );
+    }
+
     return {
         ...defaultInvoice,
         ...input,
+        logo: input.logo || defaultInvoice.logo,
         from: updatedFrom,
     };
 };
