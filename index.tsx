@@ -8,6 +8,8 @@ import ReactDOM from 'react-dom/client';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
+const DEFAULT_LOGO_URL = `${import.meta.env.BASE_URL}truffle-scent-logo.png`;
+
 interface InvoiceItem {
     name: string;
     qty: number;
@@ -28,8 +30,6 @@ interface Invoice {
     currency: string;
     discount: number;
 }
-
-const DEFAULT_LOGO_URL = `${import.meta.env.BASE_URL}truffle-scent-logo.png`;
 
 const defaultInvoice: Invoice = {
     logo: DEFAULT_LOGO_URL,
