@@ -24,3 +24,10 @@ View your app in AI Studio: https://ai.studio/apps/drive/1ZvJ0Pe34l111QWejlw7F0W
 
 - Official Invoice title block contains centred NON-VAT text.
 - Invoice number and date inputs are right-aligned so values grow leftwards when longer.
+
+
+## Version notes
+
+- Built from v5.
+- Default Truffle & Scent logo updated.
+- Invoice sender details now include TIN: 807-789-743-000 directly under DTI BN No. 8301368.

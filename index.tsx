@@ -15,8 +15,6 @@ interface InvoiceItem {
     image?: string;
 }
 
-const DEFAULT_LOGO = `${import.meta.env.BASE_URL}truffle-scent-logo.png`;
-
 interface Invoice {
     logo: string;
     signature: string;
@@ -31,12 +29,17 @@ interface Invoice {
     discount: number;
 }
 
+const BUSINESS_NAME = 'Truffle & Scent By Lee';
+const DTI_LINE = 'DTI BN No. 8301368';
+const TIN_LINE = 'TIN: 807-789-743-000';
+const DEFAULT_LOGO = 'truffleandscent-logo.png';
+
 const defaultInvoice: Invoice = {
     logo: DEFAULT_LOGO,
     signature: '',
     invoiceNumber: 'INV-T&SBLEE000',
     date: new Date().toISOString().split('T')[0],
-    from: 'Truffle & Scent By Lee\nDTI BN No. 8301368\nTIN: 807-789-743-000\nPembo Taguig\nManila, Philippines\n+63956 533 1521',
+    from: `${BUSINESS_NAME}\n${DTI_LINE}\n${TIN_LINE}\nPembo Taguig\nManila, Philippines\n+63956 533 1521`,
     to: '',
     items: [{ name: 'Mazza Deluxe Black Truffle', qty: 1, price: 649, image: '' }],
     notes: 'Thank you for your business. Please pay within the day.',
@@ -45,25 +48,29 @@ const defaultInvoice: Invoice = {
     discount: 0
 };
 
+const ensureBusinessRegistrationLines = (value: string): string => {
+    const lines = value.split('\n');
+    const businessIndex = lines.findIndex(line => line.trim() === BUSINESS_NAME);
+
+    if (businessIndex === -1) {
+        return value;
+    }
+
+    const cleanedLines = lines.filter(line => line.trim() !== TIN_LINE);
+    const cleanedBusinessIndex = cleanedLines.findIndex(line => line.trim() === BUSINESS_NAME);
+    const dtiIndex = cleanedLines.findIndex(line => line.trim() === DTI_LINE);
+
+    if (dtiIndex === -1) {
+        cleanedLines.splice(cleanedBusinessIndex + 1, 0, DTI_LINE, TIN_LINE);
+    } else {
+        cleanedLines.splice(dtiIndex + 1, 0, TIN_LINE);
+    }
+
+    return cleanedLines.join('\n');
+};
 
 const ensureInvoiceDefaults = (input: Invoice): Invoice => {
-    let updatedFrom = input.from || defaultInvoice.from;
-
-    if (updatedFrom.includes('Truffle & Scent By Lee')) {
-        if (!updatedFrom.includes('DTI BN No. 8301368')) {
-            updatedFrom = updatedFrom.replace(
-                'Truffle & Scent By Lee',
-                'Truffle & Scent By Lee\nDTI BN No. 8301368'
-            );
-        }
-
-        if (!updatedFrom.includes('TIN: 807-789-743-000')) {
-            updatedFrom = updatedFrom.replace(
-                'DTI BN No. 8301368',
-                'DTI BN No. 8301368\nTIN: 807-789-743-000'
-            );
-        }
-    }
+    const updatedFrom = ensureBusinessRegistrationLines(input.from || defaultInvoice.from);
 
     return {
         ...defaultInvoice,
