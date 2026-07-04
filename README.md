@@ -1,16 +1,10 @@
-# Smart Invoice Builder — TIN-only live files
+# Smart Invoice Builder - Truffle & Scent v5 Format TIN Address Fix
 
-Upload these files directly to the repository root and set GitHub Pages to:
+Static GitHub Pages version preserving the v5 invoice layout.
 
-Source: Deploy from branch
-Branch: main
-Folder: /root
+Changes:
+- TIN appears directly under DTI.
+- Address line below TIN reads `Pembo Taguig`.
+- FROM/TO address boxes have enough height to show all address lines cleanly.
 
-This package changes the compiled app bundle so the FROM block includes:
-
-Truffle & Scent By Lee
-DTI BN No. 8301368
-TIN: 807-789-743-000
-Pembo
-Taguig Manila, Philippines
-+63956 533 1521
+Upload these files to the repository root and keep GitHub Pages set to Deploy from a branch: main / root.
