@@ -1,16 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Invoice Builder</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="./assets/index-EYfn_aEU.js?v=tin-807-789-743-000"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-ClNS1qJZ.css?v=tin-807-789-743-000">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Invoice Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@^19.1.0",
+      "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+      "jspdf": "https://esm.sh/jspdf@^3.0.1",
+      "html2canvas": "https://esm.sh/html2canvas@^1.4.1",
+      "react/": "https://esm.sh/react@^19.1.0/",
+      "vite": "https://esm.sh/vite@^7.0.5",
+      "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^4.7.0"
+    }
+  }
+  </script>
+
+  <link rel="stylesheet" crossorigin href="./assets/index-ClNS1qJZ.css">
+
+  <script>
+  // TIN hotfix: force the FROM block before the app loads.
+  (function () {
+    const FROM_BLOCK = [
+      'Truffle & Scent By Lee',
+      'DTI BN No. 8301368',
+      'TIN: 807-789-743-000',
+      'Pembo',
+      'Manila, Philippines',
+      '+63956 533 1521'
+    ].join('\n');
+
+    function patchInvoice(raw) {
+      let invoice = {};
+      try {
+        invoice = raw ? JSON.parse(raw) : {};
+      } catch (error) {
+        invoice = {};
+      }
+
+      if (!invoice || typeof invoice !== 'object' || Array.isArray(invoice)) {
+        invoice = {};
+      }
+
+      return {
+        logo: invoice.logo || '',
+        signature: invoice.signature || '',
+        invoiceNumber: invoice.invoiceNumber || 'INV-T&SBLEE000',
+        date: invoice.date || new Date().toISOString().split('T')[0],
+        from: FROM_BLOCK,
+        to: invoice.to || '',
+        items: Array.isArray(invoice.items) && invoice.items.length
+          ? invoice.items
+          : [{ name: 'Mazza Deluxe Black Truffle', qty: 1, price: 649, image: '' }],
+        notes: invoice.notes || 'Thank you for your business. Please pay within the day.',
+        paymentMethod: invoice.paymentMethod || 'BDO: 008010348061\nGCash: 0954 984 8144\nAileen Alvarez',
+        currency: invoice.currency || 'PHP',
+        discount: typeof invoice.discount === 'number' ? invoice.discount : 0
+      };
+    }
+
+    localStorage.setItem('currentInvoice', JSON.stringify(patchInvoice(localStorage.getItem('currentInvoice'))));
+    localStorage.setItem('invoiceAppVersion', 'tin-fixed-807-789-743-000');
+
+    try {
+      const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
+      if (Array.isArray(savedInvoices)) {
+        localStorage.setItem('savedInvoices', JSON.stringify(savedInvoices.map(function (invoice) {
+          return { ...invoice, from: FROM_BLOCK };
+        })));
+      }
+    } catch (error) {}
+
+    window.__TRUFFLE_SCENT_FROM_BLOCK__ = FROM_BLOCK;
+  })();
+  </script>
 </head>
 <body>
-    <div id="root"></div>
+  <div id="root"></div>
+
+  <script type="module" crossorigin src="./assets/index-EYfn_aEU.js?v=tin-fixed"></script>
+
+  <script>
+  // Safety net: after React renders, ensure the visible FROM textarea also receives the TIN line.
+  (function () {
+    const FROM_BLOCK = window.__TRUFFLE_SCENT_FROM_BLOCK__ || [
+      'Truffle & Scent By Lee',
+      'DTI BN No. 8301368',
+      'TIN: 807-789-743-000',
+      'Pembo',
+      'Manila, Philippines',
+      '+63956 533 1521'
+    ].join('\n');
+
+    function setNativeTextareaValue(textarea, value) {
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+      setter.call(textarea, value);
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+      textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function patchFromTextarea() {
+      const textareas = Array.from(document.querySelectorAll('textarea'));
+      const fromTextarea = textareas.find(function (textarea) {
+        return textarea.value && textarea.value.includes('Truffle & Scent By Lee') && textarea.value.includes('DTI BN No. 8301368');
+      });
+
+      if (fromTextarea && fromTextarea.value !== FROM_BLOCK) {
+        setNativeTextareaValue(fromTextarea, FROM_BLOCK);
+        localStorage.setItem('currentInvoice', JSON.stringify({
+          ...(JSON.parse(localStorage.getItem('currentInvoice') || '{}')),
+          from: FROM_BLOCK
+        }));
+      }
+    }
+
+    const interval = setInterval(patchFromTextarea, 250);
+    setTimeout(function () { clearInterval(interval); patchFromTextarea(); }, 5000);
+    window.addEventListener('load', patchFromTextarea);
+    new MutationObserver(patchFromTextarea).observe(document.documentElement, { childList: true, subtree: true });
+  })();
+  </script>
 </body>
 </html>
