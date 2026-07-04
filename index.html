@@ -7,6 +7,83 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<script>
+(function () {
+  const fromBlock = [
+    'Truffle & Scent By Lee',
+    'DTI BN No. 8301368',
+    'TIN: 807-789-743-000',
+    'Pembo',
+    'Taguig Manila, Philippines',
+    '+63956 533 1521'
+  ].join('\n');
+
+  const defaultInvoice = {
+    logo: './truffleandscent-logo.png?v=12',
+    signature: '',
+    invoiceNumber: 'INV-T&SBLEE000',
+    date: new Date().toISOString().split('T')[0],
+    from: fromBlock,
+    to: '',
+    items: [
+      {
+        name: 'Mazza Deluxe Black Truffle',
+        qty: 1,
+        price: 649,
+        image: ''
+      }
+    ],
+    notes: 'Thank you for your business. Please pay within the day.',
+    paymentMethod: 'BDO: 008010348061\nGCash: 0954 984 8144\nAileen Alvarez',
+    currency: 'PHP',
+    discount: 0
+  };
+
+  function patchInvoice(raw) {
+    let existing = {};
+
+    try {
+      existing = raw ? JSON.parse(raw) : {};
+    } catch (error) {
+      existing = {};
+    }
+
+    if (!existing || typeof existing !== 'object' || Array.isArray(existing)) {
+      existing = {};
+    }
+
+    return {
+      ...defaultInvoice,
+      ...existing,
+      from: fromBlock,
+      logo: './truffleandscent-logo.png?v=12'
+    };
+  }
+
+  localStorage.setItem(
+    'currentInvoice',
+    JSON.stringify(patchInvoice(localStorage.getItem('currentInvoice')))
+  );
+
+  try {
+    const savedInvoices = JSON.parse(localStorage.getItem('savedInvoices') || '[]');
+
+    if (Array.isArray(savedInvoices)) {
+      const patchedSavedInvoices = savedInvoices.map(function (invoice) {
+        return {
+          ...invoice,
+          from: fromBlock,
+          logo: './truffleandscent-logo.png?v=12'
+        };
+      });
+
+      localStorage.setItem('savedInvoices', JSON.stringify(patchedSavedInvoices));
+    }
+  } catch (error) {
+    // Leave saved invoices alone if they cannot be read.
+  }
+})();
+</script>    
   <script type="module" crossorigin src="./assets/index-CkkuhbKU.js"></script>
 </head>
 <body>
