@@ -8,14 +8,14 @@ import ReactDOM from 'react-dom/client';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
-const DEFAULT_LOGO_URL = `${import.meta.env.BASE_URL}truffle-scent-logo.png`;
-
 interface InvoiceItem {
     name: string;
     qty: number;
     price: number;
     image?: string;
 }
+
+const DEFAULT_LOGO = `${import.meta.env.BASE_URL}truffle-scent-logo.png`;
 
 interface Invoice {
     logo: string;
@@ -32,7 +32,7 @@ interface Invoice {
 }
 
 const defaultInvoice: Invoice = {
-    logo: DEFAULT_LOGO_URL,
+    logo: DEFAULT_LOGO,
     signature: '',
     invoiceNumber: 'INV-T&SBLEE000',
     date: new Date().toISOString().split('T')[0],
@@ -49,24 +49,20 @@ const defaultInvoice: Invoice = {
 const ensureInvoiceDefaults = (input: Invoice): Invoice => {
     let updatedFrom = input.from || defaultInvoice.from;
 
-    if (
-        updatedFrom.includes('Truffle & Scent By Lee') &&
-        !updatedFrom.includes('DTI BN No. 8301368')
-    ) {
-        updatedFrom = updatedFrom.replace(
-            'Truffle & Scent By Lee',
-            'Truffle & Scent By Lee\nDTI BN No. 8301368'
-        );
-    }
+    if (updatedFrom.includes('Truffle & Scent By Lee')) {
+        if (!updatedFrom.includes('DTI BN No. 8301368')) {
+            updatedFrom = updatedFrom.replace(
+                'Truffle & Scent By Lee',
+                'Truffle & Scent By Lee\nDTI BN No. 8301368'
+            );
+        }
 
-    if (
-        updatedFrom.includes('DTI BN No. 8301368') &&
-        !updatedFrom.includes('TIN: 807-789-743-000')
-    ) {
-        updatedFrom = updatedFrom.replace(
-            'DTI BN No. 8301368',
-            'DTI BN No. 8301368\nTIN: 807-789-743-000'
-        );
+        if (!updatedFrom.includes('TIN: 807-789-743-000')) {
+            updatedFrom = updatedFrom.replace(
+                'DTI BN No. 8301368',
+                'DTI BN No. 8301368\nTIN: 807-789-743-000'
+            );
+        }
     }
 
     return {

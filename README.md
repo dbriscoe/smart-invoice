@@ -24,10 +24,3 @@ View your app in AI Studio: https://ai.studio/apps/drive/1ZvJ0Pe34l111QWejlw7F0W
 
 - Official Invoice title block contains centred NON-VAT text.
 - Invoice number and date inputs are right-aligned so values grow leftwards when longer.
-
-
-## Current branded defaults
-
-- Logo: Truffle & Scent by LEE gold circular logo.
-- DTI BN No. 8301368
-- TIN: 807-789-743-000
