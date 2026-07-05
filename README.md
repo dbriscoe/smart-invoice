@@ -1,10 +1,3 @@
-# Smart Invoice Builder - Truffle & Scent v5 Format TIN Address Fix
+# Smart Invoice Builder - Truffle & Scent
 
-Static GitHub Pages version preserving the v5 invoice layout.
-
-Changes:
-- TIN appears directly under DTI.
-- Address line below TIN reads `Pembo Taguig`.
-- FROM/TO address boxes have enough height to show all address lines cleanly.
-
-Upload these files to the repository root and keep GitHub Pages set to Deploy from a branch: main / root.
+Static GitHub Pages invoice app. This version preserves the v5 invoice layout in PDF export on mobile devices and includes the TIN under the DTI number.

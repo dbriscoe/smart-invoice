@@ -317,7 +317,7 @@
 
     .notes-payment { display: flex; flex-direction: column; gap: 16px; }
     .notes-payment textarea { min-height: 60px; }
-    .notes-payment .payment textarea { min-height: 76px; }
+    .notes-payment .payment textarea { min-height: 116px; overflow: hidden; }
 
     .totals-section {
       background: var(--lilac);
@@ -417,6 +417,77 @@
       .address-section, .totals-and-notes { grid-template-columns: 1fr; gap: 18px; }
       .items-table { display: block; overflow-x: auto; white-space: nowrap; }
       .logo-container { width: 100%; justify-content: center; }
+    }
+
+
+    /* PDF export must always use the desktop/v5 invoice layout, even when generated on a phone. */
+    .invoice-box.pdf-export {
+      width: 872px !important;
+      max-width: 872px !important;
+      min-width: 872px !important;
+      padding: 24px !important;
+      background: #ffffff !important;
+    }
+
+    .invoice-box.pdf-export .invoice-header {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: flex-start !important;
+      gap: 24px !important;
+    }
+
+    .invoice-box.pdf-export .logo-container {
+      width: 185px !important;
+      min-height: 150px !important;
+      justify-content: flex-start !important;
+      align-items: flex-start !important;
+    }
+
+    .invoice-box.pdf-export .invoice-details {
+      width: auto !important;
+      min-width: 310px !important;
+      align-items: flex-end !important;
+    }
+
+    .invoice-box.pdf-export .invoice-title-block {
+      text-align: right !important;
+    }
+
+    .invoice-box.pdf-export .address-section {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 30px !important;
+    }
+
+    .invoice-box.pdf-export .totals-and-notes {
+      display: grid !important;
+      grid-template-columns: 2fr 1.1fr !important;
+      gap: 24px !important;
+    }
+
+    .invoice-box.pdf-export .items-table {
+      display: table !important;
+      overflow: visible !important;
+      white-space: normal !important;
+      width: 100% !important;
+    }
+
+    .invoice-box.pdf-export textarea {
+      resize: none !important;
+      overflow: hidden !important;
+    }
+
+    .invoice-box.pdf-export .address-section textarea {
+      min-height: 148px !important;
+    }
+
+    .invoice-box.pdf-export .notes-payment textarea {
+      min-height: 72px !important;
+    }
+
+    .invoice-box.pdf-export .notes-payment .payment textarea {
+      min-height: 126px !important;
     }
 
     @media print {
@@ -820,23 +891,74 @@ GCash: 0956 533 1521</textarea>
         alert('PDF tools are still loading. Please try again in a moment.');
         return;
       }
-      const canvas = await html2canvas(invoiceBox, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-      const imgData = canvas.toDataURL('image/png');
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 8;
-      const maxWidth = pageWidth - margin * 2;
-      const imgHeight = canvas.height * maxWidth / canvas.width;
-      let y = margin;
-      if (imgHeight <= pageHeight - margin * 2) {
-        pdf.addImage(imgData, 'PNG', margin, y, maxWidth, imgHeight);
-      } else {
-        const ratio = (pageHeight - margin * 2) / imgHeight;
-        pdf.addImage(imgData, 'PNG', margin, y, maxWidth * ratio, imgHeight * ratio);
+
+      const original = {
+        className: invoiceBox.className,
+        width: invoiceBox.style.width,
+        minWidth: invoiceBox.style.minWidth,
+        maxWidth: invoiceBox.style.maxWidth,
+        scrollX: window.scrollX,
+        scrollY: window.scrollY
+      };
+
+      const textAreaStates = Array.from(invoiceBox.querySelectorAll('textarea')).map(el => ({
+        el,
+        height: el.style.height,
+        overflow: el.style.overflow
+      }));
+
+      try {
+        invoiceBox.classList.add('pdf-export');
+        invoiceBox.style.width = '872px';
+        invoiceBox.style.minWidth = '872px';
+        invoiceBox.style.maxWidth = '872px';
+
+        textAreaStates.forEach(({ el }) => {
+          el.style.height = 'auto';
+          el.style.height = `${Math.max(el.scrollHeight + 8, el.offsetHeight)}px`;
+          el.style.overflow = 'hidden';
+        });
+
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+        const canvas = await html2canvas(invoiceBox, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          windowWidth: 1000,
+          width: invoiceBox.scrollWidth,
+          height: invoiceBox.scrollHeight
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 8;
+        const maxWidth = pageWidth - margin * 2;
+        const maxHeight = pageHeight - margin * 2;
+        const imgHeightAtFullWidth = canvas.height * maxWidth / canvas.width;
+
+        if (imgHeightAtFullWidth <= maxHeight) {
+          pdf.addImage(imgData, 'PNG', margin, margin, maxWidth, imgHeightAtFullWidth);
+        } else {
+          const fitWidth = canvas.width * maxHeight / canvas.height;
+          pdf.addImage(imgData, 'PNG', margin, margin, fitWidth * maxWidth / canvas.width, maxHeight);
+        }
+
+        pdf.save(`${invoice.invoiceNumber || 'invoice'}.pdf`);
+      } finally {
+        invoiceBox.className = original.className;
+        invoiceBox.style.width = original.width;
+        invoiceBox.style.minWidth = original.minWidth;
+        invoiceBox.style.maxWidth = original.maxWidth;
+        textAreaStates.forEach(({ el, height, overflow }) => {
+          el.style.height = height;
+          el.style.overflow = overflow;
+        });
+        window.scrollTo(original.scrollX, original.scrollY);
       }
-      pdf.save(`${invoice.invoiceNumber || 'invoice'}.pdf`);
     }
 
     wireEvents();
