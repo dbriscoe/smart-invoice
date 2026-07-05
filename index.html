@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Invoice Builder</title>
+    <!-- Truffle & Scent v10: contenteditable PDF textbox fix -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -57,7 +58,7 @@
       flex-wrap: wrap;
     }
 
-    button, select, input, textarea {
+    button, select, input, textarea, .editable-area {
       font-family: inherit;
     }
 
@@ -218,7 +219,7 @@
       border-radius: 6px 6px 0 0;
     }
 
-    textarea, .fake-area {
+    textarea, .fake-area, .editable-area {
       width: 100%;
       min-height: 118px;
       border: 1px solid var(--line);
@@ -237,6 +238,18 @@
       overflow-wrap: break-word;
       word-break: normal;
     }
+    .editable-area {
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      word-break: normal;
+      outline: none;
+      overflow: hidden;
+    }
+
+    .editable-area:empty::before {
+      content: attr(data-placeholder);
+      color: #6b7280;
+    }
 
     .pdf-print-area {
       resize: none;
@@ -244,6 +257,7 @@
     }
 
     .address-section textarea,
+    .address-section .editable-area,
     .address-section .pdf-print-area {
       min-height: 128px;
       font-size: 13px;
@@ -328,8 +342,8 @@
     }
 
     .notes-payment { display: flex; flex-direction: column; gap: 16px; }
-    .notes-payment textarea { min-height: 60px; }
-    .notes-payment .payment textarea { min-height: 116px; overflow: hidden; }
+    .notes-payment textarea, .notes-payment .editable-area { min-height: 60px; }
+    .notes-payment .payment textarea, .notes-payment .payment .editable-area { min-height: 136px; overflow: hidden; }
 
     .totals-section {
       background: var(--lilac);
@@ -486,22 +500,26 @@
     }
 
     .invoice-box.pdf-export textarea,
+    .invoice-box.pdf-export .editable-area,
     .invoice-box.pdf-export .pdf-print-area {
       resize: none !important;
       overflow: hidden !important;
     }
 
     .invoice-box.pdf-export .address-section textarea,
+    .invoice-box.pdf-export .address-section .editable-area,
     .invoice-box.pdf-export .address-section .pdf-print-area {
       min-height: 148px !important;
     }
 
     .invoice-box.pdf-export .notes-payment textarea,
+    .invoice-box.pdf-export .notes-payment .editable-area,
     .invoice-box.pdf-export .notes-payment .pdf-print-area {
       min-height: 72px !important;
     }
 
     .invoice-box.pdf-export .notes-payment .payment textarea,
+    .invoice-box.pdf-export .notes-payment .payment .editable-area,
     .invoice-box.pdf-export .notes-payment .payment .pdf-print-area {
       min-height: 126px !important;
     }
@@ -512,7 +530,7 @@
       .app-title, .toolbar, .saved-invoices-container { display: none !important; }
       .invoice-box { border: none; box-shadow: none; padding: 0; }
       button, .button { display: none !important; }
-      input, textarea { border-color: transparent !important; background: transparent !important; }
+      input, textarea, .editable-area { border-color: transparent !important; background: transparent !important; }
       .item-image-uploader, .signature-uploader { border-color: transparent !important; }
     }
   </style>
@@ -564,16 +582,16 @@
       <div class="address-section">
         <div class="address-box">
           <h3>From</h3>
-          <textarea id="from">Truffle &amp; Scent By Lee
+          <div id="from" class="editable-area" contenteditable="true" role="textbox" aria-multiline="true">Truffle &amp; Scent By Lee
 DTI BN No. 8301368
 TIN: 807-789-743-000
 Pembo Taguig
 Manila, Philippines
-+63956 533 1521</textarea>
++63956 533 1521</div>
         </div>
         <div class="address-box">
           <h3>To</h3>
-          <textarea id="to" placeholder="Who is this invoice to?"></textarea>
+          <div id="to" class="editable-area" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Who is this invoice to?"></div>
         </div>
       </div>
 
@@ -599,14 +617,14 @@ Manila, Philippines
         <div class="notes-payment">
           <div>
             <h3>Notes</h3>
-            <textarea id="notes">Thank you for your business. Please pay within the day.</textarea>
+            <div id="notes" class="editable-area" contenteditable="true" role="textbox" aria-multiline="true">Thank you for your business. Please pay within the day.</div>
           </div>
           <div class="payment">
             <h3>Payment Method</h3>
-            <textarea id="paymentMethod">BDO: 008010348061
+            <div id="paymentMethod" class="editable-area" contenteditable="true" role="textbox" aria-multiline="true">BDO: 008010348061
 CASH ON DELIVERY
 GCash: 0954 984 8144
-GCash: 0956 533 1521</textarea>
+GCash: 0956 533 1521</div>
           </div>
         </div>
 
@@ -748,14 +766,25 @@ GCash: 0956 533 1521</textarea>
       reader.readAsDataURL(file);
     }
 
+    function setEditableText(el, value) {
+      const text = value || '';
+      if (el.innerText !== text) {
+        el.textContent = text;
+      }
+    }
+
+    function getEditableText(el) {
+      return (el.innerText || '').replace(/\u00a0/g, ' ').replace(/\n+$/g, '');
+    }
+
     function render() {
       els.logo.src = invoice.logo || DEFAULT_LOGO;
       els.invoiceNumber.value = invoice.invoiceNumber;
       els.invoiceDate.value = invoice.date;
-      els.from.value = invoice.from;
-      els.to.value = invoice.to;
-      els.notes.value = invoice.notes;
-      els.paymentMethod.value = invoice.paymentMethod;
+      setEditableText(els.from, invoice.from);
+      setEditableText(els.to, invoice.to);
+      setEditableText(els.notes, invoice.notes);
+      setEditableText(els.paymentMethod, invoice.paymentMethod);
       els.currency.value = invoice.currency;
       els.discount.value = invoice.discount;
 
@@ -925,9 +954,13 @@ GCash: 0956 533 1521</textarea>
         invoiceBox.style.minWidth = '872px';
         invoiceBox.style.maxWidth = '872px';
 
-        // html2canvas can flatten <textarea> line breaks on some mobile browsers/PDF viewers.
-        // For the capture only, replace each textarea with a normal printable block that
-        // uses white-space: pre-wrap, then restore the original controls afterwards.
+        // Update editable blocks from the current DOM before capture.
+        ['from', 'to', 'notes', 'paymentMethod'].forEach(id => {
+          invoice[id] = getEditableText(els[id]);
+        });
+        saveCurrent();
+
+        // Fallback only: convert any remaining textarea to printable blocks.
         textareaReplacements = Array.from(invoiceBox.querySelectorAll('textarea')).map(el => {
           const replacement = document.createElement('div');
           replacement.className = 'fake-area pdf-print-area';
