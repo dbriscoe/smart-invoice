@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Invoice Builder - Truffle & Scent v11</title>
+  <title>Smart Invoice Builder - Truffle & Scent v12</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -146,6 +146,23 @@
       object-fit: contain;
       display: block;
       cursor: pointer;
+    }
+
+
+
+    .eshop-brand {
+      margin: -14px 0 22px 0;
+      text-align: left;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.18;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .eshop-brand span {
+      display: block;
     }
 
     .invoice-details {
@@ -573,7 +590,24 @@
         gap: 12px;
       }
 
-      .invoice-details {
+  
+
+    .eshop-brand {
+      margin: -14px 0 22px 0;
+      text-align: left;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.18;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .eshop-brand span {
+      display: block;
+    }
+
+    .invoice-details {
         width: 100%;
         min-width: 0;
         align-items: stretch;
@@ -650,6 +684,11 @@
         </div>
       </div>
 
+      <div class="eshop-brand" aria-label="Alvarez Eshop Collections">
+        <span>ALVAREZ ESHOP</span>
+        <span>COLLECTIONS</span>
+      </div>
+
       <div class="address-section">
         <div class="address-box">
           <h3>From</h3>
@@ -724,10 +763,10 @@
   <script src="vendor/jspdf.umd.min.js"></script>
   <script>
     const DEFAULT_LOGO = 'truffleandscent_logo_2.png';
-    const STORAGE_KEY = 'truffleScentInvoiceV11';
-    const SAVED_KEY = 'truffleScentSavedInvoicesV11';
-    const LEGACY_STORAGE_KEYS = ['truffleScentInvoiceV9', 'currentInvoice'];
-    const LEGACY_SAVED_KEYS = ['truffleScentSavedInvoicesV9', 'savedInvoices'];
+    const STORAGE_KEY = 'truffleScentInvoiceV12';
+    const SAVED_KEY = 'truffleScentSavedInvoicesV12';
+    const LEGACY_STORAGE_KEYS = ['truffleScentInvoiceV11', 'truffleScentInvoiceV10', 'truffleScentInvoiceV9', 'currentInvoice'];
+    const LEGACY_SAVED_KEYS = ['truffleScentSavedInvoicesV11', 'truffleScentSavedInvoicesV10', 'truffleScentSavedInvoicesV9', 'savedInvoices'];
 
     const CANONICAL_FROM = [
       'Truffle & Scent By Lee',
@@ -739,10 +778,9 @@
     ].join('\n');
 
     const DEFAULT_PAYMENT_METHOD = [
-      'BDO: 008010348061',
-      'CASH ON DELIVERY',
-      'GCash: 0954 984 8144',
-      'GCash: 0956 533 1521'
+      'BPI: 1616155124',
+      'AILEEN ALVAREZ',
+      'GCASH: 09549848144'
     ].join('\n');
 
     const defaultInvoice = {
@@ -809,6 +847,7 @@
     function normaliseInvoice(value, options = {}) {
       const inv = { ...defaultInvoice, ...(value || {}) };
       inv.from = normaliseFrom(inv.from);
+      inv.paymentMethod = normalisePaymentMethod(inv.paymentMethod);
       if (!Array.isArray(inv.items) || inv.items.length === 0) {
         inv.items = [...defaultInvoice.items];
       }
@@ -825,6 +864,17 @@
       }
       if (text.includes('DTI BN No. 8301368') && !text.includes('TIN: 807-789-743-000')) {
         return text.replace('DTI BN No. 8301368', 'DTI BN No. 8301368\nTIN: 807-789-743-000');
+      }
+      return text;
+    }
+
+    function normalisePaymentMethod(value) {
+      const text = normaliseNewlines(value || DEFAULT_PAYMENT_METHOD).trim();
+      if (!text) {
+        return DEFAULT_PAYMENT_METHOD;
+      }
+      if (text.includes('BDO: 008010348061') || text.includes('CASH ON DELIVERY') || text.includes('GCash: 0954 984 8144') || text.includes('GCash: 0956 533 1521')) {
+        return DEFAULT_PAYMENT_METHOD;
       }
       return text;
     }

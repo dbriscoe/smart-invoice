@@ -1,4 +1,4 @@
-# Smart Invoice Builder - Truffle & Scent v11
+# Smart Invoice Builder - Truffle & Scent v12
 
 Static GitHub Pages invoice app for Truffle & Scent By Lee.
 
@@ -12,3 +12,8 @@ Included updates:
 - Desktop and PDF layout keeps FROM and TO side by side.
 - Signature image upload works from the signature box and the uploaded signature is included in the PDF export.
 - Local `vendor/` copies of html2canvas and jsPDF, so PDF export does not depend on CDN access.
+
+
+## v12 changes
+- Added ALVAREZ ESHOP / COLLECTIONS label under the logo.
+- Updated payment method to BPI: 1616155124, AILEEN ALVAREZ, GCASH: 09549848144.
