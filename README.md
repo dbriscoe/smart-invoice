@@ -1,4 +1,4 @@
-# Smart Invoice Builder - Truffle & Scent v12
+# Smart Invoice Builder - Truffle & Scent v13
 
 Static GitHub Pages invoice app for Truffle & Scent By Lee.
 
@@ -17,3 +17,7 @@ Included updates:
 ## v12 changes
 - Added ALVAREZ ESHOP / COLLECTIONS label under the logo.
 - Updated payment method to BPI: 1616155124, AILEEN ALVAREZ, GCASH: 09549848144.
+
+
+## v13 changes
+- Increased the ALVAREZ ESHOP / COLLECTIONS label to match the OFFICIAL INVOICE title size.
